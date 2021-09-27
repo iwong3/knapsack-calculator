@@ -1,23 +1,22 @@
 {
   "files": {
-    "main.css": "/knapsack-calculator/static/css/main.a617e044.chunk.css",
-    "main.js": "/knapsack-calculator/static/js/main.4860df7f.chunk.js",
-    "main.js.map": "/knapsack-calculator/static/js/main.4860df7f.chunk.js.map",
-    "runtime-main.js": "/knapsack-calculator/static/js/runtime-main.7e10796d.js",
-    "runtime-main.js.map": "/knapsack-calculator/static/js/runtime-main.7e10796d.js.map",
-    "static/js/2.f6df409e.chunk.js": "/knapsack-calculator/static/js/2.f6df409e.chunk.js",
-    "static/js/2.f6df409e.chunk.js.map": "/knapsack-calculator/static/js/2.f6df409e.chunk.js.map",
-    "static/js/3.c89568ca.chunk.js": "/knapsack-calculator/static/js/3.c89568ca.chunk.js",
-    "static/js/3.c89568ca.chunk.js.map": "/knapsack-calculator/static/js/3.c89568ca.chunk.js.map",
+    "main.css": "/knapsack-calculator/static/css/main.68372bd8.chunk.css",
+    "main.js": "/knapsack-calculator/static/js/main.89488540.chunk.js",
+    "main.js.map": "/knapsack-calculator/static/js/main.89488540.chunk.js.map",
+    "runtime-main.js": "/knapsack-calculator/static/js/runtime-main.6583e12e.js",
+    "runtime-main.js.map": "/knapsack-calculator/static/js/runtime-main.6583e12e.js.map",
+    "static/js/2.153a036e.chunk.js": "/knapsack-calculator/static/js/2.153a036e.chunk.js",
+    "static/js/2.153a036e.chunk.js.map": "/knapsack-calculator/static/js/2.153a036e.chunk.js.map",
+    "static/js/3.2f731e52.chunk.js": "/knapsack-calculator/static/js/3.2f731e52.chunk.js",
+    "static/js/3.2f731e52.chunk.js.map": "/knapsack-calculator/static/js/3.2f731e52.chunk.js.map",
     "index.html": "/knapsack-calculator/index.html",
-    "static/css/main.a617e044.chunk.css.map": "/knapsack-calculator/static/css/main.a617e044.chunk.css.map",
-    "static/js/2.f6df409e.chunk.js.LICENSE.txt": "/knapsack-calculator/static/js/2.f6df409e.chunk.js.LICENSE.txt",
-    "static/media/logo.6ce24c58.svg": "/knapsack-calculator/static/media/logo.6ce24c58.svg"
+    "static/css/main.68372bd8.chunk.css.map": "/knapsack-calculator/static/css/main.68372bd8.chunk.css.map",
+    "static/js/2.153a036e.chunk.js.LICENSE.txt": "/knapsack-calculator/static/js/2.153a036e.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.7e10796d.js",
-    "static/js/2.f6df409e.chunk.js",
-    "static/css/main.a617e044.chunk.css",
-    "static/js/main.4860df7f.chunk.js"
+    "static/js/runtime-main.6583e12e.js",
+    "static/js/2.153a036e.chunk.js",
+    "static/css/main.68372bd8.chunk.css",
+    "static/js/main.89488540.chunk.js"
   ]
 }
