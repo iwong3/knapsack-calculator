@@ -1,4 +1,22 @@
-# Getting Started with Create React App
+# Knapsack Calculator
+
+# Table of Contents
+
+1. [Setup](#setup)
+2. [Deploying](#deploying)
+3. [React](#react)
+
+# Setup
+
+This project is a React app that uses Github Pages for hosting.
+
+Please follow the instructions [here](https://github.com/gitname/react-gh-pages) for reference.
+
+# Deploying
+
+Run `npm run deploy` to deploy.
+
+# React
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
