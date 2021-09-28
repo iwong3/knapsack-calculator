@@ -7,7 +7,6 @@ import './knapsack-calculator.css';
  *  TODO:
  *  - functionality
  *      - show list of selected items
- *      - input for target
  *      - input for quantity (think about how to handle quantity, not trivial)
  *      - price input restrictions (numbers only)
  *      - reset button w/ confirmation?
@@ -107,59 +106,42 @@ export default class KnapsackCalculator extends Component {
 
     /** FORM HANDLERS */
 
-    handle_item_name_change = (e, index) => {
-        // update item name
-        let item_names = this.state.item_names
-        item_names[index] = e.target.value
-        this.setState({
-            item_names: item_names
-        })
-
-        // reset selections
-        this.reset_item_selections()
-    }
-
-    handle_item_price_change = (e, index) => {
-        // update item price
-        let item_prices = this.state.item_prices
-        item_prices[index] = e.target.value
-        this.setState({
-            item_prices: item_prices
-        })
-
-        // reset selections
-        this.reset_item_selections()
-    }
-
     render_input = (index) => {
         // dynamic classname for indicating selections
-        let input_group_classname = "input_group"
+        let input_group_id = "unselected"
         if (this.state.item_selections[index] === true) {
-            input_group_classname = "input_group-selected"
+            input_group_id = "selected"
         }
 
         // render input group
         return (
-            <div className={input_group_classname}>
-                <div className="input_group-section">
+            <div className="input_group" id={input_group_id}>
+                <div className="input_group-section" id="name">
                     <div className="input_group-label">Item: </div>
                     <input
+                        className="input_group-input"
+                        id="name-input"
                         type="text"
                         value={this.state.item_names[index]}
                         onChange={(e) => {this.handle_item_name_change(e, index)}}
                     />
                 </div>
-                <div className="input_group-section">
+                <div className="input_group-section" id="price">
                     <div className="input_group-label">Price: </div>
                     <input
+                        className="input_group-input"
+                        id="price-input"
                         type="text"
                         value={this.state.item_prices[index]}
                         onChange={(e) => {this.handle_item_price_change(e, index)}}
                     />
                 </div>
-                <button onClick={(e) => {this.remove_input(e, index)}}>
-                    Remove Item
-                </button>
+                <div className="input_group-section" id="close">
+                    <div
+                        className="remove_icon"
+                        onClick={(e) => {this.remove_input(e, index)}}>
+                    </div>
+                </div>
             </div>
         )
     }
@@ -197,6 +179,40 @@ export default class KnapsackCalculator extends Component {
         this.reset_item_selections()
     }
 
+    handle_item_name_change = (e, index) => {
+        // update item name
+        let item_names = this.state.item_names
+        item_names[index] = e.target.value
+        this.setState({
+            item_names: item_names
+        })
+
+        // reset selections
+        this.reset_item_selections()
+    }
+
+    handle_item_price_change = (e, index) => {
+        // update item price
+        let item_prices = this.state.item_prices
+        item_prices[index] = e.target.value
+        this.setState({
+            item_prices: item_prices
+        })
+
+        // reset selections
+        this.reset_item_selections()
+    }
+
+    handle_target_change = (e) => {
+        // update target
+        this.setState({
+            target: e.target.value
+        })
+
+        // reset selections
+        this.reset_item_selections()
+    }
+
     reset_item_selections = () => {
         // reset all item selections to false
         const num_items = this.state.item_prices.length
@@ -205,15 +221,22 @@ export default class KnapsackCalculator extends Component {
             item_selections.push(false)
         }
         this.setState({
-            item_selections: item_selections
+            item_selections: item_selections,
+            total: 0
         })
     }
 
     render() {
         return (
             <div className="KnapsackCalculator">
-                <div>Target: </div>
-                <div>{this.state.target}</div>
+                <div>Target</div>
+                <input
+                    className="input_group-input"
+                    id="target-input"
+                    type="text"
+                    value={this.state.target}
+                    onChange={(e) => {this.handle_target_change(e)}}
+                />
                 <div>Total: </div>
                 <div>{this.state.total}</div>
                 <form>

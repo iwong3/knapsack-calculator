@@ -1,29 +1,92 @@
 .KnapsackCalculator {
+    /* flex */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    /* spacing */
     padding: 5%;
+    /* design */
+    background-color: #82c3ff;
+    /* other */
+    font-family: 'Courier New', monospace;
 }
 
+/* FORM & INPUTS */
+
 form {
+    width: 80%;
     padding: 5%;
 }
 
 .input_group {
     display: flex;
+    margin: 2% 0%;
+    /* design */
+    background-color: #fefefe;
+    border-radius: 15px;
+    box-shadow: 2px 5px 2px 0 rgb(0 0 0 / 10%);
+    transition: filter 0.2s ease;
 }
 
-.input_group-selected {
-    border-color: red;
-    border-style: solid;
+#selected.input_group {
+    background-color: #ffdc00;
 }
 
 .input_group-section {
     display: flex;
-    padding: 5%;
+    align-items: center;
+    justify-content: center;
 }
 
 .input_group-label {
     margin-right: 2%;
+}
+
+input {
+    /* spacing */
+    width: 100%;
+    /* design */
+    outline: none;
+    border: none;
+    /* other */
+    font-family: 'Courier New', monospace;
+}
+
+#target-input {
+    background-color: #82c3ff;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+#name.input_group-section {
+    flex: 5;
+    padding: 5% 2.5% 5% 5%;
+}
+
+#price.input_group-section {
+    flex: 2;
+    padding: 5% 2.5% 5% 2.5%;
+}
+
+#close.input_group-section {
+    flex: 1;
+    padding: 5% 5% 5% 2.5%;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove_icon {
+    /* spacing */
+    width: 32px;
+    height: 32px;
+    /* design */
+    content:url('./images/icons8-cancel-48.png');
+    transition: filter 0.2s ease;
+}
+
+.remove_icon:hover {
+    filter: brightness(120%);
+    cursor: pointer;
 }
