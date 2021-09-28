@@ -17,6 +17,9 @@ import './knapsack-calculator.css';
  *      - remove item button -> symbol
  *      - width of inputs (price doesn't need to be big)
  *      - mobile specific design
+ *  - design
+ *      - think about separate components
+ *      - think about moving functions to utility files
  */
 export default class KnapsackCalculator extends Component {
 
