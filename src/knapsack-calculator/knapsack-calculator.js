@@ -5,17 +5,18 @@ import './knapsack-calculator.css';
 
 /**
  *  TODO:
- *  - dynamic inputs
- *      - add inputs
- *      - remove inputs
- *          - keep existing input values
- *  - show results
- *      - total
- *      - selected items
- *  - button to calculate results
- *  - input for target
+ *  - functionality
+ *      - show list of selected items
+ *      - input for target
+ *      - input for quantity (think about how to handle quantity, not trivial)
+ *      - price input restrictions (numbers only)
+ *      - reset button w/ confirmation?
  *  - styling
- *  - price input restrictions (numbers only)
+ *      - highlight selected items differently
+ *      - button placement
+ *      - remove item button -> symbol
+ *      - width of inputs (price doesn't need to be big)
+ *      - mobile specific design
  */
 export default class KnapsackCalculator extends Component {
 
@@ -37,15 +38,13 @@ export default class KnapsackCalculator extends Component {
     }
 
     calculate_solution = () => {
-
+        // reset selections
         this.reset_item_selections()
 
         // init vars for knapsack
-        const item_names = this.state.item_names
         const item_prices = this.state.item_prices.map(price => {
             return parseFloat(price, 10) * 100
         })
-        console.log(item_prices)
         let item_selections = this.state.item_selections
         const num_items = item_prices.length
         const target = this.state.target * 100
@@ -65,12 +64,8 @@ export default class KnapsackCalculator extends Component {
             for (let j = 1; j <= target; j++) {
                 const current_item_price = item_prices[i-1]
                 const target_without = T[i-1][j]
-                // console.log("target without: " + target_without)
                 if (current_item_price <= j) {
                     const target_with = T[i-1][j-current_item_price]+current_item_price
-                    // console.log("target with: " + target_with)
-                    // console.log("1: " + T[i-1][j-current_item_price])
-                    // console.log("2: " + current_item_price)
                     T[i][j] = Math.max(target_with, target_without);
                 } else {
                     T[i][j] = target_without
@@ -78,16 +73,11 @@ export default class KnapsackCalculator extends Component {
             }
         }
 
-        // debug T[][]
-        // for (let i = 0; i < T.length; i++) {
-        //     console.log(T[i])
-        // }
-
-        // get cost of chosen items
+        // get total cost of selected items
         const total = T[num_items][target] / 100.
 
-        // get chosen items
-        let chosen_items_idxs = []
+        // get selected items
+        let selected_items_idxs = []
         let curr_item_idx = num_items
         let curr_target_idx = target
         while (curr_item_idx > 0 && curr_target_idx > 0) {
@@ -97,47 +87,55 @@ export default class KnapsackCalculator extends Component {
                 continue
             }
             // curr item used
-            chosen_items_idxs.push(curr_item_idx-1)
+            selected_items_idxs.push(curr_item_idx-1)
             curr_target_idx -= item_prices[curr_item_idx-1]
             curr_item_idx--
         }
-
-        chosen_items_idxs.map(idx => {
+        selected_items_idxs.map(idx => {
             item_selections[idx] = true
         })
 
-        console.log(item_selections)
-
+        // update state
         this.setState({
             item_selections: item_selections,
             total: total
         })
-
     }
 
+    /** FORM HANDLERS */
+
     handle_item_name_change = (e, index) => {
+        // update item name
         let item_names = this.state.item_names
         item_names[index] = e.target.value
         this.setState({
             item_names: item_names
         })
+
+        // reset selections
         this.reset_item_selections()
     }
 
     handle_item_price_change = (e, index) => {
+        // update item price
         let item_prices = this.state.item_prices
         item_prices[index] = e.target.value
         this.setState({
             item_prices: item_prices
         })
+
+        // reset selections
         this.reset_item_selections()
     }
 
     render_input = (index) => {
+        // dynamic classname for indicating selections
         let input_group_classname = "input_group"
         if (this.state.item_selections[index] === true) {
             input_group_classname = "input_group-selected"
         }
+
+        // render input group
         return (
             <div className={input_group_classname}>
                 <div className="input_group-section">
@@ -164,12 +162,14 @@ export default class KnapsackCalculator extends Component {
     }
 
     append_input = () => {
+        // add input group
         this.setState(prevState => ({
             inputs: prevState.inputs.concat([this.state.inputs.length]),
             item_names: prevState.item_names.concat([""]),
             item_prices: prevState.item_prices.concat([0])
         }))
 
+        // reset selections
         this.reset_item_selections()
     }
 
@@ -190,10 +190,12 @@ export default class KnapsackCalculator extends Component {
             item_prices: updated_item_prices
         })
 
+        // reset selections
         this.reset_item_selections()
     }
 
     reset_item_selections = () => {
+        // reset all item selections to false
         const num_items = this.state.item_prices.length
         let item_selections = []
         for (let i = 0; i < num_items; i++) {
