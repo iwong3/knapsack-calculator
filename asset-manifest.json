@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/knapsack-calculator/static/css/main.d6411fa2.chunk.css",
-    "main.js": "/knapsack-calculator/static/js/main.eaeb39d8.chunk.js",
-    "main.js.map": "/knapsack-calculator/static/js/main.eaeb39d8.chunk.js.map",
+    "main.css": "/knapsack-calculator/static/css/main.9fad9b0d.chunk.css",
+    "main.js": "/knapsack-calculator/static/js/main.9e46df8d.chunk.js",
+    "main.js.map": "/knapsack-calculator/static/js/main.9e46df8d.chunk.js.map",
     "runtime-main.js": "/knapsack-calculator/static/js/runtime-main.017002eb.js",
     "runtime-main.js.map": "/knapsack-calculator/static/js/runtime-main.017002eb.js.map",
     "static/js/2.1e2bac9b.chunk.js": "/knapsack-calculator/static/js/2.1e2bac9b.chunk.js",
@@ -10,13 +10,13 @@
     "static/js/3.75038621.chunk.js": "/knapsack-calculator/static/js/3.75038621.chunk.js",
     "static/js/3.75038621.chunk.js.map": "/knapsack-calculator/static/js/3.75038621.chunk.js.map",
     "index.html": "/knapsack-calculator/index.html",
-    "static/css/main.d6411fa2.chunk.css.map": "/knapsack-calculator/static/css/main.d6411fa2.chunk.css.map",
+    "static/css/main.9fad9b0d.chunk.css.map": "/knapsack-calculator/static/css/main.9fad9b0d.chunk.css.map",
     "static/js/2.1e2bac9b.chunk.js.LICENSE.txt": "/knapsack-calculator/static/js/2.1e2bac9b.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.017002eb.js",
     "static/js/2.1e2bac9b.chunk.js",
-    "static/css/main.d6411fa2.chunk.css",
-    "static/js/main.eaeb39d8.chunk.js"
+    "static/css/main.9fad9b0d.chunk.css",
+    "static/js/main.9e46df8d.chunk.js"
   ]
 }
