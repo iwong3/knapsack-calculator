@@ -56,8 +56,10 @@ form {
 }
 
 .input_group {
+    /* spacing */
     display: flex;
     margin: 2% 0%;
+    padding: 2.5% 0% 2.5% 0%;
     /* design */
     background-color: #fefefe;
     border-radius: 15px;
@@ -77,12 +79,12 @@ form {
 
 #name.input_group-section {
     flex: 5;
-    padding: 5% 2.5% 5% 5%;
+    padding: 0% 2.5% 0% 2.5%;
 }
 
 #price.input_group-section {
     flex: 2;
-    padding: 5% 2.5% 5% 2.5%;
+    padding: 0% 2.5% 0% 2.5%;
 }
 
 #close.input_group-section {

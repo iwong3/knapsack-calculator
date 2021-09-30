@@ -13,11 +13,7 @@ import './knapsack-calculator.css';
  *          - limit max $
  *      - reset button w/ confirmation?
  *  - styling
- *      - highlight selected items differently
- *      - button placement
- *      - remove item button -> symbol
- *      - width of inputs (price doesn't need to be big)
- *      - mobile specific design
+ *      - close icon has fixed width - spacing is weird because its wrapped by div
  *  - design
  *      - think about separate components
  *      - think about moving functions to utility files
