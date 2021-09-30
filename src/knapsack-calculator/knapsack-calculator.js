@@ -32,6 +32,7 @@ export default class KnapsackCalculator extends Component {
             item_names: ["soda", "watermelon", "gum"],
             item_prices: [1.99, 5.99, 0.99],
             item_selections: [false, false, false],
+            remainder: "$10",
             target: "$10",
             total: "$0",
         }
@@ -82,8 +83,9 @@ export default class KnapsackCalculator extends Component {
             }
         }
 
-        // get total cost of selected items
-        const total = T[num_items][target] / 100.
+        // get total cost and remainder of selected items
+        const total = (T[num_items][target] / 100.).toFixed(2)
+        const remainder = ((target / 100.) - total).toFixed(2)
 
         // get selected items
         let selected_items_idxs = []
@@ -107,6 +109,7 @@ export default class KnapsackCalculator extends Component {
         // update state
         this.setState({
             item_selections: item_selections,
+            remainder: "$" + remainder,
             total: "$" + total
         })
     }
@@ -124,11 +127,12 @@ export default class KnapsackCalculator extends Component {
         return (
             <div className="input_group" id={input_group_id}>
                 <div className="input_group-section" id="name">
-                    <div className="input_group-label">&#62;</div>
+                    {/* <div className="input_group-label"></div> */}
                     <input
                         className="input_group-input"
                         id={input_group_id}
                         type="text"
+                        placeholder="Enter Item"
                         value={this.state.item_names[index]}
                         onChange={(e) => {this.handle_item_name_change(e, index)}}
                     />
@@ -238,6 +242,7 @@ export default class KnapsackCalculator extends Component {
         }
         this.setState({
             item_selections: item_selections,
+            remainder: this.state.target,
             total: "$0"
         })
     }
@@ -245,27 +250,40 @@ export default class KnapsackCalculator extends Component {
     render() {
         return (
             <div className="KnapsackCalculator">
-                <div>Target</div>
-                <input
-                    className="input_group-input"
-                    id="target-input"
-                    type="text"
-                    value={this.state.target}
-                    onChange={(e) => {this.handle_target_change(e)}}
-                />
-                <div>Total: </div>
-                <div>{this.state.total}</div>
+                {/* HEADERS */}
+                <div className="header1">
+                    <div>Budget</div>
+                    <input
+                        className="input_group-input"
+                        id="target-input"
+                        type="text"
+                        value={this.state.target}
+                        onChange={(e) => {this.handle_target_change(e)}}
+                    />
+                </div>
+                <div className="header2">
+                    <div className="header2-section">
+                        Total: {this.state.total}
+                    </div>
+                    <div className="header2-section">
+                        Remaining: {this.state.remainder}
+                    </div>
+                </div>
+                {/* ITEM INPUTS */}
                 <form>
                     {this.state.inputs.map(index => {
                         return this.render_input(index)
                     })}
                 </form>
-                <button onClick={() => this.append_input()}>
-                    Add Item
-                </button>
-                <button onClick={() => this.calculate_solution()}>
-                    Calculate
-                </button>
+                {/* BUTTONS */}
+                <div className="button_group">
+                    <div className="button" id="add-item" onClick={() => this.append_input()}>
+                        Add Item
+                    </div>
+                    <div className="button" id="calculate" onClick={() => this.calculate_solution()}>
+                        Calculate
+                    </div>
+                </div>
             </div>
         )
     }
