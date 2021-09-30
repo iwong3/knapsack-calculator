@@ -134,7 +134,7 @@ export default class KnapsackCalculator extends Component {
                     />
                 </div>
                 <div className="input_group-section" id="price">
-                    <div className="input_group-label">Price: </div>
+                    <div className="input_group-label">$</div>
                     <input
                         className="input_group-input"
                         id={input_group_id}
