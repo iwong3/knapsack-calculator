@@ -9,6 +9,8 @@ import './knapsack-calculator.css';
  *      - show list of selected items
  *      - input for quantity (think about how to handle quantity, not trivial)
  *      - price input restrictions (numbers only)
+ *          - stop calculate + show user bad input
+ *          - limit max $
  *      - reset button w/ confirmation?
  *  - styling
  *      - highlight selected items differently
@@ -30,13 +32,18 @@ export default class KnapsackCalculator extends Component {
             item_names: ["soda", "watermelon", "gum"],
             item_prices: [1.99, 5.99, 0.99],
             item_selections: [false, false, false],
-            target: 10,
-            total: 0,
+            target: "$10",
+            total: "$0",
         }
 
         this.calculate_solution = this.calculate_solution.bind(this)
+        this.render_input = this.render_input.bind(this)
+        this.append_input = this.append_input.bind(this)
+        this.remove_input = this.remove_input.bind(this)
         this.handle_item_name_change = this.handle_item_name_change.bind(this)
         this.handle_item_price_change = this.handle_item_price_change.bind(this)
+        this.handle_target_change = this.handle_target_change.bind(this)
+        this.reset_item_selections = this.reset_item_selections.bind(this)
     }
 
     calculate_solution = () => {
@@ -49,7 +56,7 @@ export default class KnapsackCalculator extends Component {
         })
         let item_selections = this.state.item_selections
         const num_items = item_prices.length
-        const target = this.state.target * 100
+        const target = (parseFloat(this.state.target.substring(1)) * 100).toFixed(0)
 
         // init table for dp
         let T = new Array(num_items+1)
@@ -100,7 +107,7 @@ export default class KnapsackCalculator extends Component {
         // update state
         this.setState({
             item_selections: item_selections,
-            total: total
+            total: "$" + total
         })
     }
 
@@ -117,10 +124,10 @@ export default class KnapsackCalculator extends Component {
         return (
             <div className="input_group" id={input_group_id}>
                 <div className="input_group-section" id="name">
-                    <div className="input_group-label">Item: </div>
+                    <div className="input_group-label">&#62;</div>
                     <input
                         className="input_group-input"
-                        id="name-input"
+                        id={input_group_id}
                         type="text"
                         value={this.state.item_names[index]}
                         onChange={(e) => {this.handle_item_name_change(e, index)}}
@@ -130,7 +137,7 @@ export default class KnapsackCalculator extends Component {
                     <div className="input_group-label">Price: </div>
                     <input
                         className="input_group-input"
-                        id="price-input"
+                        id={input_group_id}
                         type="text"
                         value={this.state.item_prices[index]}
                         onChange={(e) => {this.handle_item_price_change(e, index)}}
@@ -204,9 +211,18 @@ export default class KnapsackCalculator extends Component {
     }
 
     handle_target_change = (e) => {
+        let input = e.target.value
+        const price_regex = /^\$((0\.\d{1,2})|([1-9])+(\d)*(\.\d{0,2})?)$/g
+        // if (isNaN(input)) {
+            // return
+        // }
+        if (!input) {
+            input = "$"
+        }
+
         // update target
         this.setState({
-            target: e.target.value
+            target: input
         })
 
         // reset selections
@@ -222,7 +238,7 @@ export default class KnapsackCalculator extends Component {
         }
         this.setState({
             item_selections: item_selections,
-            total: 0
+            total: "$0"
         })
     }
 

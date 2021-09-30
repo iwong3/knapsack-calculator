@@ -12,10 +12,25 @@
     font-family: 'Courier New', monospace;
 }
 
+/* HEADER */
+
+.header-value {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#target-input {
+    background-color: #82c3ff;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bold;
+}
+
 /* FORM & INPUTS */
 
 form {
-    width: 80%;
+    width: 100%;
     padding: 5%;
 }
 
@@ -39,6 +54,23 @@ form {
     justify-content: center;
 }
 
+#name.input_group-section {
+    flex: 10;
+    padding: 5% 2.5% 5% 5%;
+}
+
+#price.input_group-section {
+    flex: 4;
+    padding: 5% 2.5% 5% 2.5%;
+}
+
+#close.input_group-section {
+    flex: 1;
+    padding: 0% 2.5% 0% 0%;
+    align-items: center;
+    justify-content: center;
+}
+
 .input_group-label {
     margin-right: 2%;
 }
@@ -51,30 +83,12 @@ input {
     border: none;
     /* other */
     font-family: 'Courier New', monospace;
+    font-size: 1em;
+    overflow-wrap: break-word;
 }
 
-#target-input {
-    background-color: #82c3ff;
-    text-align: center;
-    font-size: 32px;
-    font-weight: bold;
-}
-
-#name.input_group-section {
-    flex: 5;
-    padding: 5% 2.5% 5% 5%;
-}
-
-#price.input_group-section {
-    flex: 2;
-    padding: 5% 2.5% 5% 2.5%;
-}
-
-#close.input_group-section {
-    flex: 1;
-    padding: 5% 5% 5% 2.5%;
-    align-items: center;
-    justify-content: center;
+#selected.input_group-input {
+    background-color: #ffdc00;
 }
 
 .remove_icon {
