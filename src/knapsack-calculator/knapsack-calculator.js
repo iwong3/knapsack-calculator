@@ -12,6 +12,8 @@ import './knapsack-calculator.css';
  *          - stop calculate + show user bad input
  *          - limit max $
  *      - reset button w/ confirmation?
+ *  - bugs
+ *      - when we update the budget, the form is reset but the remaining value isn't updated properly
  *  - styling
  *      - close icon has fixed width - spacing is weird because its wrapped by div
  *  - design
