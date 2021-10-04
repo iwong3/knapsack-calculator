@@ -8,19 +8,29 @@ import './knapsack-calculator.css';
  *  - functionality
  *      - show list of selected items
  *      - input for quantity (think about how to handle quantity, not trivial)
- *      - price input restrictions (numbers only)
- *          - stop calculate + show user bad input
- *          - limit max $
  *      - reset button w/ confirmation?
+ *      - click to include item
+ *      - pin item
+ *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
+ *      - press enter to enter new item
  *  - bugs
- *      - when we update the budget, the form is reset but the remaining value isn't updated properly
  *  - styling
+ *      - top always visible
+ *      - add / calculate always visible
  *      - close icon has fixed width - spacing is weird because its wrapped by div
  *  - design
  *      - think about separate components
  *      - think about moving functions to utility files
  */
 export default class KnapsackCalculator extends Component {
+
+    // price vars
+    MAX_TARGET = 9999.99
+
+    // price regex
+    REGEX_DECIMALS = /(\.\d{0,1})$/
+    REGEX_PRICE = /^((\d)*(\.\d{0,2})?)$/
+    REGEX_TARGET = /^\$((\d)*(\.\d{0,2})?)$/
 
     constructor(props) {
         super(props)
@@ -30,9 +40,9 @@ export default class KnapsackCalculator extends Component {
             item_names: ["soda", "watermelon", "gum"],
             item_prices: [1.99, 5.99, 0.99],
             item_selections: [false, false, false],
-            remainder: "$10",
-            target: "$10",
-            total: "$0",
+            remainder: "$10.00",
+            target: "$10.00",
+            total: "$0.00",
         }
 
         this.calculate_solution = this.calculate_solution.bind(this)
@@ -112,8 +122,9 @@ export default class KnapsackCalculator extends Component {
         })
     }
 
-    /** FORM HANDLERS */
+    /** FORM VISUALS */
 
+    // renders item inputs
     render_input = (index) => {
         // dynamic classname for indicating selections
         let input_group_id = "unselected"
@@ -125,14 +136,13 @@ export default class KnapsackCalculator extends Component {
         return (
             <div className="input_group" id={input_group_id}>
                 <div className="input_group-section" id="name">
-                    {/* <div className="input_group-label"></div> */}
                     <input
                         className="input_group-input"
                         id={input_group_id}
                         type="text"
                         placeholder="Enter Item"
                         value={this.state.item_names[index]}
-                        onChange={(e) => {this.handle_item_name_change(e, index)}}
+                        onChange={(e) => this.handle_item_name_change(e, index)}
                     />
                 </div>
                 <div className="input_group-section" id="price">
@@ -142,7 +152,8 @@ export default class KnapsackCalculator extends Component {
                         id={input_group_id}
                         type="text"
                         value={this.state.item_prices[index]}
-                        onChange={(e) => {this.handle_item_price_change(e, index)}}
+                        onChange={(e) => this.handle_item_price_change(e, index)}
+                        onBlur={(e) => this.check_price(e, index)}
                     />
                 </div>
                 <div className="input_group-section" id="close">
@@ -155,80 +166,151 @@ export default class KnapsackCalculator extends Component {
         )
     }
 
+    /** FORM LOGIC - ADDING & REMOVING ITEMS */
+
+    // add item
     append_input = () => {
-        // add input group
         this.setState(prevState => ({
             inputs: prevState.inputs.concat([this.state.inputs.length]),
             item_names: prevState.item_names.concat([""]),
-            item_prices: prevState.item_prices.concat([0])
-        }))
-
-        // reset selections
-        this.reset_item_selections()
+            item_prices: prevState.item_prices.concat([(0.00).toFixed(2)])
+        }), function() {
+            this.reset_item_selections()
+        })
     }
 
+    // remove item
     remove_input = (e, index) => {
         // stop auto refresh
         e.preventDefault()
 
-        // remove item & update state
+        // remove item
         const updated_inputs = this.state.inputs
-        updated_inputs.pop()
         const updated_item_names = this.state.item_names
-        updated_item_names.splice(index, 1)
         const updated_item_prices = this.state.item_prices
+        updated_inputs.pop()
+        updated_item_names.splice(index, 1)
         updated_item_prices.splice(index, 1)
+
+        // update state & reset selections
         this.setState({
             inputs: updated_inputs,
             item_names: updated_item_names,
             item_prices: updated_item_prices
+        }, function() {
+            this.reset_item_selections()
         })
-
-        // reset selections
-        this.reset_item_selections()
     }
 
+    /** FORM LOGIC - UPDATING VALUES */
+
+    // item names handler
     handle_item_name_change = (e, index) => {
-        // update item name
         let item_names = this.state.item_names
         item_names[index] = e.target.value
         this.setState({
             item_names: item_names
+        }, function() {
+            this.reset_item_selections()
         })
-
-        // reset selections
-        this.reset_item_selections()
     }
 
+    // item prices handler
     handle_item_price_change = (e, index) => {
-        // update item price
-        let item_prices = this.state.item_prices
-        item_prices[index] = e.target.value
-        this.setState({
-            item_prices: item_prices
-        })
-
-        // reset selections
-        this.reset_item_selections()
+        let input = e.target.value
+        if (this.REGEX_PRICE.test(input)) {
+            let item_prices = this.state.item_prices
+            item_prices[index] = input
+            this.setState({
+                item_prices: item_prices
+            }, function() {
+                this.reset_item_selections()
+            })
+        }
     }
 
+    // target handler
     handle_target_change = (e) => {
         let input = e.target.value
-        const price_regex = /^\$((0\.\d{1,2})|([1-9])+(\d)*(\.\d{0,2})?)$/g
-        // if (isNaN(input)) {
-            // return
-        // }
-        if (!input) {
+        // target should always include '$'
+        if (input.length === 0) {
             input = "$"
         }
+        if (this.REGEX_TARGET.test(input)) {
+            // make sure target is below max budget
+            const price = parseFloat(input.substring(1))
+            if (isNaN(price) || price <= this.MAX_TARGET) {
+                this.setState({
+                    target: input
+                }, function() {
+                    this.reset_item_selections()
+                })
+            }
+        }
+    }
 
-        // update target
+    // standardizes price format
+    format_price = (input) => {
+        // check decimals
+        input = this.format_decimals(input)
+
+        // trim leading zeros
+        input = input.replace(/^0+/, '')
+        if (input.slice(0, 1) === ".") {
+            input = "0" + input
+        }
+
+        return input
+    }
+
+    // standardizes decimals
+    format_decimals = (input) => {
+        // ends with partial decimals
+        if (this.REGEX_DECIMALS.test(input)) {
+            if (input.slice(-1) === '.') {
+                input += "00"
+            } else {
+                input += "0"
+            }
+        }
+        // no decimals
+        else if (!input.includes('.')) {
+            input += ".00"
+        }
+
+        return input
+    }
+
+    // price formatting on blur
+    check_price = (e, index) => {
+        // format input
+        let input = e.target.value
+        input = this.format_price(input)
+
+        // update item price
+        let item_prices = this.state.item_prices
+        item_prices[index] = input
+
+        // update state & reset selections
+        this.setState({
+            item_prices: item_prices
+        }, function() {
+            this.reset_item_selections()
+        })
+    }
+
+    // target formatting on blur
+    check_target = (e) => {
+        // format input
+        let input = e.target.value
+        input = "$" + this.format_price(input.substring(1))
+
+        // update state & reset selections
         this.setState({
             target: input
+        }, function() {
+            this.reset_item_selections()
         })
-
-        // reset selections
-        this.reset_item_selections()
     }
 
     reset_item_selections = () => {
@@ -238,10 +320,12 @@ export default class KnapsackCalculator extends Component {
         for (let i = 0; i < num_items; i++) {
             item_selections.push(false)
         }
+
+        // update state
         this.setState({
             item_selections: item_selections,
             remainder: this.state.target,
-            total: "$0"
+            total: "$0.00"
         })
     }
 
@@ -249,22 +333,27 @@ export default class KnapsackCalculator extends Component {
         return (
             <div className="KnapsackCalculator">
                 {/* HEADERS */}
-                <div className="header1">
-                    <div>Budget</div>
-                    <input
-                        className="input_group-input"
-                        id="target-input"
-                        type="text"
-                        value={this.state.target}
-                        onChange={(e) => {this.handle_target_change(e)}}
-                    />
-                </div>
-                <div className="header2">
-                    <div className="header2-section">
-                        Total: {this.state.total}
+                <div className="header_top">
+                    <div className="header1">
+                        <div className="header1-label">Budget</div>
+                        <input
+                            className="input_group-input"
+                            id="target-input"
+                            type="text"
+                            value={this.state.target}
+                            onChange={(e) => this.handle_target_change(e)}
+                            onBlur={(e) => this.check_target(e)}
+                        />
                     </div>
-                    <div className="header2-section">
-                        Remaining: {this.state.remainder}
+                    <div className="header2">
+                        <div className="header2-section">
+                            <div className="header2-label">Total</div>
+                            <div className="header2-value">{this.state.total}</div>
+                        </div>
+                        <div className="header2-section">
+                            <div className="header2-label">Remaining</div>
+                            <div className="header2-value">{this.state.remainder}</div>
+                        </div>
                     </div>
                 </div>
                 {/* ITEM INPUTS */}

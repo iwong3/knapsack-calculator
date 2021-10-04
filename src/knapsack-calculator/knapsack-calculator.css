@@ -19,11 +19,27 @@
 
 /* HEADER */
 
+.header_top {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    /* position: fixed; */
+    /* top: 0; */
+    /* z-index: 999; */
+    /* width: 100%; */
+}
+
 .header1 {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.header1-input {
+    display: flex;
+    width: 10%;
 }
 
 #target-input {
@@ -41,11 +57,16 @@
 }
 
 .header2-section {
-    margin: 0% 2.5% 0% 2.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
 }
 
-.header2-section div {
-    /* text-align: center; */
+.header2-value {
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
 /* FORM & INPUTS */
