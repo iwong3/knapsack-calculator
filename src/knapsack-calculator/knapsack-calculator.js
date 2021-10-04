@@ -12,7 +12,7 @@ import './knapsack-calculator.css';
  *      - click to include item
  *      - pin item
  *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
- *      - press enter to enter new item
+ *      - focus on new item when pressing enter
  *  - bugs
  *  - styling
  *      - top always visible
@@ -38,7 +38,7 @@ export default class KnapsackCalculator extends Component {
         this.state = {
             inputs: [0, 1, 2],
             item_names: ["soda", "watermelon", "gum"],
-            item_prices: [1.99, 5.99, 0.99],
+            item_prices: ["1.99", "5.99", "0.99"],
             item_selections: [false, false, false],
             remainder: "$10.00",
             target: "$10.00",
@@ -52,6 +52,8 @@ export default class KnapsackCalculator extends Component {
         this.handle_item_name_change = this.handle_item_name_change.bind(this)
         this.handle_item_price_change = this.handle_item_price_change.bind(this)
         this.handle_target_change = this.handle_target_change.bind(this)
+        this.check_price = this.check_price.bind(this)
+        this.check_target = this.check_target.bind(this)
         this.reset_item_selections = this.reset_item_selections.bind(this)
     }
 
@@ -134,7 +136,7 @@ export default class KnapsackCalculator extends Component {
 
         // render input group
         return (
-            <div className="input_group" id={input_group_id}>
+            <div className="input_group" id={input_group_id} key={index}>
                 <div className="input_group-section" id="name">
                     <input
                         className="input_group-input"
@@ -143,6 +145,7 @@ export default class KnapsackCalculator extends Component {
                         placeholder="Enter Item"
                         value={this.state.item_names[index]}
                         onChange={(e) => this.handle_item_name_change(e, index)}
+                        onKeyDown={(e) => this.handle_enter(e, index)}
                     />
                 </div>
                 <div className="input_group-section" id="price">
@@ -151,6 +154,7 @@ export default class KnapsackCalculator extends Component {
                         className="input_group-input"
                         id={input_group_id}
                         type="text"
+                        placeholder="0.00"
                         value={this.state.item_prices[index]}
                         onChange={(e) => this.handle_item_price_change(e, index)}
                         onBlur={(e) => this.check_price(e, index)}
@@ -169,12 +173,26 @@ export default class KnapsackCalculator extends Component {
     /** FORM LOGIC - ADDING & REMOVING ITEMS */
 
     // add item
-    append_input = () => {
-        this.setState(prevState => ({
-            inputs: prevState.inputs.concat([this.state.inputs.length]),
-            item_names: prevState.item_names.concat([""]),
-            item_prices: prevState.item_prices.concat([(0.00).toFixed(2)])
-        }), function() {
+    append_input = (index) => {
+        // add item at index
+        let inputs = this.state.inputs
+        let item_names = this.state.item_names
+        let item_prices = this.state.item_prices
+        inputs = inputs.concat([this.state.inputs.length])
+        if (index === -1) {
+            item_names = item_names.concat("")
+            item_prices = item_prices.concat("")
+        } else {
+            item_names.splice(index, 0, "")
+            item_prices.splice(index, 0, "")
+        }
+
+        // update state & reset selections
+        this.setState({
+            inputs: inputs,
+            item_names: item_names,
+            item_prices: item_prices
+        }, function() {
             this.reset_item_selections()
         })
     }
@@ -213,6 +231,14 @@ export default class KnapsackCalculator extends Component {
         }, function() {
             this.reset_item_selections()
         })
+    }
+
+    // new item on enter
+    handle_enter = (e, index) => {
+        if (e.key === 'Enter') {
+            this.append_input(index+1)
+            this.reset_item_selections()
+        }
     }
 
     // item prices handler
@@ -364,7 +390,7 @@ export default class KnapsackCalculator extends Component {
                 </form>
                 {/* BUTTONS */}
                 <div className="button_group">
-                    <div className="button" id="add-item" onClick={() => this.append_input()}>
+                    <div className="button" id="add-item" onClick={() => this.append_input(-1)}>
                         Add Item
                     </div>
                     <div className="button" id="calculate" onClick={() => this.calculate_solution()}>
