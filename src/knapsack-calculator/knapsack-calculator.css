@@ -20,10 +20,6 @@
     flex-direction: column;
     justify-items: center;
     align-items: center;
-    /* position: fixed; */
-    /* top: 0; */
-    /* z-index: 999; */
-    /* width: 100%; */
 }
 
 .header1 {
@@ -90,25 +86,53 @@ form {
 
 .input_group-section {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+}
+
+#pin.input_group-section {
+    flex: 1;
+    padding: 0% 0% 0% 1%;
+    justify-content: center;
+    align-items: center;
 }
 
 #name.input_group-section {
     flex: 5;
-    padding: 0% 2.5% 0% 2.5%;
+    padding: 0% 2.5% 0% 0%;
 }
 
 #price.input_group-section {
     flex: 2;
-    padding: 0% 2.5% 0% 2.5%;
+    padding: 0% 0% 0% 0%;
 }
 
 #close.input_group-section {
     flex: 1;
-    padding: 0% 1% 0% 0%;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 0% 1% 0% 0%;
+}
+
+.pin_icon {
+    /* spacing */
+    height: 18px;
+    width: 18px;
+    /* design */
+    transition: filter 0.2s ease;
+}
+
+.pin_icon:hover {
+    cursor: pointer;
+    filter: brightness(120%);
+}
+
+#unselected.pin_icon {
+    content:url('./images/icons8-unchecked-checkbox-48.png');
+}
+
+#selected.pin_icon {
+    content:url('./images/icons8-checked-checkbox-48.png');
 }
 
 .input_group-label {
