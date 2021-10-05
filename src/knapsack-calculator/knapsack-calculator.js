@@ -6,15 +6,20 @@ import './knapsack-calculator.css';
 /**
  *  TODO:
  *  - functionality
+ *      - price formatting
+ *          - when clicking on price, get ready to re-input? unless no change, then keep prev value
  *      - look into O(W) space version of dp knapsack
+ *      - remove item - update pinned totals/remaining
+ *      - updating price should unpin item
  *      - show list of selected items
  *      - input for quantity (think about how to handle quantity, not trivial)
+ *      - sort orders (price, alphabetical, input order)
+ *      - click and drag/drop
  *      - reset button w/ confirmation?
- *      - click to include item
- *      - pin item
  *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
  *      - focus on new item when pressing enter
  *      - improve price input: start from right (last two always decimals)
+ *      - unpin all button
  *  - bugs
  *  - styling
  *      - top always visible
@@ -32,6 +37,7 @@ export default class KnapsackCalculator extends Component {
     // price regex
     REGEX_DECIMALS = /(\.\d{0,1})$/
     REGEX_PRICE = /^((\d)*(\.\d{0,2})?)$/
+    REGEX_PRICE_RTL = /^((\d)*(\.)?(\d)*)$/
 
     constructor(props) {
         super(props)
@@ -217,6 +223,7 @@ export default class KnapsackCalculator extends Component {
                         type="text"
                         placeholder="0.00"
                         value={this.state.item_prices[index]}
+                        dir="rtl"
                         onChange={(e) => this.handle_item_price_change(e, index)}
                         onBlur={(e) => this.check_price(e, index)}
                     />
@@ -374,7 +381,12 @@ export default class KnapsackCalculator extends Component {
     // item prices handler
     handle_item_price_change = (e, index) => {
         let input = e.target.value
-        if (this.REGEX_PRICE.test(input)) {
+        if (this.REGEX_PRICE_RTL.test(input)) {
+            // fix decimals
+            if (input.length >= 3 && input.slice(-1) !== '.') {
+                input = input.replace('.', '')
+                input = input.slice(0, -2) + '.' + input.slice(-2)
+            }
             let item_prices = this.state.item_prices
             item_prices[index] = input
             this.setState({
@@ -401,21 +413,17 @@ export default class KnapsackCalculator extends Component {
         return input
     }
 
-    // standardizes decimals in price string
+    // standardizes decimals in price string (rtl)
     format_decimals_string = (input) => {
-        // ends with partial decimals
-        if (this.REGEX_DECIMALS.test(input)) {
-            if (input.slice(-1) === '.') {
-                input += "00"
-            } else {
-                input += "0"
-            }
+        if (input.length === 1) {
+            return ".0" + input
         }
-        // no decimals
-        else if (!input.includes('.')) {
-            input += ".00"
+        if (input.length === 2) {
+            return "." + input
         }
-
+        if (input.slice(-1) === '.') {
+            return input + "00"
+        }
         return input
     }
 
@@ -455,13 +463,16 @@ export default class KnapsackCalculator extends Component {
         // reset all item selections to pinned - deep copy
         let item_selections = JSON.parse(JSON.stringify(this.state.pinned_items))
 
-        // reset total to pinned total
-        const total = this.format_price_string("" + this.state.pinned_total)
+        // reset total and remainder, accounting for pinned items
+        const pinned_total = this.state.pinned_total
+        const total = this.format_price_string("" + pinned_total)
+        const remainder = this.toFixedNumber(this.state.target - pinned_total, 2)
+        const remainderStr = this.format_price_string("" + remainder)
 
         // update state
         this.setState({
             item_selections: item_selections,
-            remainder: this.state.target,
+            remainder: remainderStr,
             total: total
         })
     }
