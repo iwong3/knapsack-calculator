@@ -68,7 +68,7 @@ form {
     padding: 5%;
 }
 
-.input_group {
+.input_group-unselected, .input_group-selected {
     /* spacing */
     display: flex;
     margin: 2% 0%;
@@ -80,7 +80,7 @@ form {
     transition: filter 0.2s ease;
 }
 
-#selected.input_group {
+.input_group-selected {
     background-color: #ffdc00;
 }
 
@@ -114,7 +114,7 @@ form {
     padding: 0% 1% 0% 0%;
 }
 
-.pin_icon {
+.pin_icon-unselected, .pin_icon-selected {
     /* spacing */
     height: 18px;
     width: 18px;
@@ -122,16 +122,16 @@ form {
     transition: filter 0.2s ease;
 }
 
-.pin_icon:hover {
+.pin_icon-unselected:hover, .pin_icon-selected:hover {
     cursor: pointer;
     filter: brightness(120%);
 }
 
-#unselected.pin_icon {
+.pin_icon-unselected {
     content:url('./images/icons8-unchecked-checkbox-48.png');
 }
 
-#selected.pin_icon {
+.pin_icon-selected {
     content:url('./images/icons8-checked-checkbox-48.png');
 }
 
@@ -151,7 +151,7 @@ input {
     overflow-wrap: break-word;
 }
 
-#selected.input_group-input {
+.input_group-input-name-selected, .input_group-input-price-selected {
     background-color: #ffdc00;
 }
 

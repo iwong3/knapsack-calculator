@@ -14,7 +14,6 @@ import './knapsack-calculator.css';
  *      - reset button w/ confirmation?
  *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
  *      - focus on new item when pressing enter
- *      - improve price input: start from right (last two always decimals)
  *      - unpin all button
  *  - bugs
  *  - styling
@@ -190,20 +189,18 @@ export default class KnapsackCalculator extends Component {
 
         // render input group
         return (
-            <div className="input_group" id={input_group_id} key={index}>
+            <div className={"input_group-"+input_group_id} key={index}>
                 {/* PIN BUTTON */}
                 <div className="input_group-section" id="pin">
                     <div
-                        className="pin_icon"
-                        id={pin_icon_id}
+                        className={"pin_icon-"+pin_icon_id}
                         onClick={(e) => {this.toggle_pin_input(e, index)}}>
                     </div>
                 </div>
                 {/* ITEM NAME */}
                 <div className="input_group-section" id="name">
                     <input
-                        className="input_group-input"
-                        id={input_group_id}
+                        className={"input_group-input-name-"+input_group_id}
                         type="text"
                         placeholder="Enter Item"
                         value={this.state.item_names[index]}
@@ -215,8 +212,7 @@ export default class KnapsackCalculator extends Component {
                 <div className="input_group-section" id="price">
                     <div className="input_group-label">$</div>
                     <input
-                        className="input_group-input"
-                        id={input_group_id}
+                        className={"input_group-input-price-"+input_group_id}
                         type="text"
                         placeholder="0.00"
                         value={this.state.item_prices[index]}
@@ -391,6 +387,31 @@ export default class KnapsackCalculator extends Component {
     handle_item_price_click = (e, index) => {
         // save original price
         const saved_price = e.target.value
+
+        // update placeholder with original price
+        // if new item, saved price will be empty, so update placeholder
+        let placeholder = saved_price
+        if (placeholder === "") {
+            placeholder = "0.00"
+        }
+        // find number of pinned items prior to current item (affects index)
+        const pinned_items = this.state.pinned_items
+        let num_pinned_prior = 0
+        for (let i = 0; i < index; i++) {
+            if (pinned_items[i]) {
+                num_pinned_prior++
+            }
+        }
+        // current item pinned
+        if (pinned_items[index]) {
+            document.getElementsByClassName("input_group-input-price-selected")[num_pinned_prior]
+                .setAttribute('placeholder', placeholder)
+        }
+        // current item not pinned
+        else {
+            document.getElementsByClassName("input_group-input-price-unselected")[index-num_pinned_prior]
+                .setAttribute('placeholder', placeholder)
+        }
 
         // clear price
         let item_prices = this.state.item_prices
