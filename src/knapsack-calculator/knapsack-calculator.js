@@ -15,6 +15,8 @@ import './knapsack-calculator.css';
  *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
  *      - focus on new item when pressing enter
  *      - unpin all button
+ *      - tax rate
+ *      - user feedback (cant pin, not a number (price & target))
  *  - bugs
  *  - styling
  *      - top always visible
@@ -61,6 +63,12 @@ export default class KnapsackCalculator extends Component {
         this.check_price = this.check_price.bind(this)
         this.check_target = this.check_target.bind(this)
         this.reset_item_selections = this.reset_item_selections.bind(this)
+    }
+
+    componentDidMount = () => {
+        // resize target input
+        const targetInput = document.getElementById("target-input")
+        this.resizeInput(targetInput)
     }
 
     /* CORE ALGORITHMS */
@@ -214,6 +222,7 @@ export default class KnapsackCalculator extends Component {
                     <input
                         className={"input_group-input-price-"+input_group_id}
                         type="text"
+                        inputMode="numeric"
                         placeholder="0.00"
                         value={this.state.item_prices[index]}
                         onClick={(e) => this.handle_item_price_click(e, index)}
@@ -230,6 +239,11 @@ export default class KnapsackCalculator extends Component {
                 </div>
             </div>
         )
+    }
+
+    // resize input based on input value length
+    resizeInput = (input) => {
+        input.style.width = input.value.length + "ch"
     }
 
     /* FORM LOGIC - ADDING & REMOVING ITEMS */
@@ -305,7 +319,7 @@ export default class KnapsackCalculator extends Component {
 
     // new item on enter
     handle_enter = (e, index) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
             this.append_input(index+1)
             this.reset_item_selections()
         }
@@ -313,13 +327,33 @@ export default class KnapsackCalculator extends Component {
 
     /* FORM LOGIC - UPDATING VALUES */
 
-    // target handler
+    // target click handler
+    handle_target_click = (e) => {
+        // save original price
+        const saved_price = e.target.value
+
+        // update placeholder with original price
+        document.getElementById("target-input").setAttribute("placeholder", saved_price)
+
+        // clear price
+        let target = this.state.target
+        target = ""
+        this.setState({
+            saved_price: saved_price,
+            target: target,
+        }, function() {
+            this.reset_item_selections()
+        })
+    }
+
+    // target change handler
     handle_target_change = (e) => {
-        let input = e.target.value.substring(1)
+        let input = e.target.value
         if (this.REGEX_PRICE.test(input)) {
             // make sure target is below max budget
             const price = this.toFixedNumber(parseFloat(input), 2)
             if (isNaN(price) || price <= this.MAX_TARGET) {
+                // update state & reset selections
                 this.setState({
                     target: input,
                 }, function() {
@@ -405,12 +439,12 @@ export default class KnapsackCalculator extends Component {
         // current item pinned
         if (pinned_items[index]) {
             document.getElementsByClassName("input_group-input-price-selected")[num_pinned_prior]
-                .setAttribute('placeholder', placeholder)
+                .setAttribute("placeholder", placeholder)
         }
         // current item not pinned
         else {
             document.getElementsByClassName("input_group-input-price-unselected")[index-num_pinned_prior]
-                .setAttribute('placeholder', placeholder)
+                .setAttribute("placeholder", placeholder)
         }
 
         // clear price
@@ -508,14 +542,26 @@ export default class KnapsackCalculator extends Component {
 
     // target formatting on blur
     check_target = (e) => {
+        // check for saved original price & reset saved price
+        let input = e.target.value
+        let saved_price = this.state.saved_price
+        if (input === "" && saved_price !== "") {
+            input = saved_price
+        }
+        saved_price = ""
+
         // format input
-        let input = e.target.value.substring(1)
         input = this.format_price_string(input)
 
-        // update state & reset selections
+        // update state
         this.setState({
             target: input,
         }, function() {
+            // resize target input
+            const targetInput = document.getElementById("target-input")
+            this.resizeInput(targetInput)
+
+            // reset selections
             this.reset_item_selections()
         })
     }
@@ -545,14 +591,18 @@ export default class KnapsackCalculator extends Component {
                 <div className="header_top">
                     <div className="header1">
                         <div className="header1-label">Budget</div>
-                        <input
-                            className="input_group-input"
-                            id="target-input"
-                            type="text"
-                            value={"$"+this.state.target}
-                            onChange={(e) => this.handle_target_change(e)}
-                            onBlur={(e) => this.check_target(e)}
-                        />
+                        <div className="header1-input">
+                            <div className="header1-input-label">$</div>
+                            <input
+                                className="input_group-input"
+                                id="target-input"
+                                type="text"
+                                value={this.state.target}
+                                onClick={(e) => this.handle_target_click(e)}
+                                onChange={(e) => this.handle_target_change(e)}
+                                onBlur={(e) => this.check_target(e)}
+                            />
+                        </div>
                     </div>
                     <div className="header2">
                         <div className="header2-section">
