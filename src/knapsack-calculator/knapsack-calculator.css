@@ -175,24 +175,27 @@ input {
 
 .button_group {
     display: flex;
-    flex-direction: column;
-    margin-left: auto;
-    width: 35%;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .button {
     /* spacing */
-    margin: 5% 0% 5% 0%;
-    padding: 2.5% 5% 2.5% 5%;
+    margin: 0% 0% 0% 5%;
+    padding: 3%;
+    height: 1.1em;
+    width: 1.1em;
     /* design */
     background-color: #ffdc00;
     border-radius: 10px;
     box-shadow: 2px 5px 2px 0 rgb(0 0 0 / 10%);
-    transition: filter 0.2s ease;
     text-align: center;
 }
 
-.button:hover {
-    cursor: pointer;
-    filter: brightness(120%);
+#add-item.button {
+    content:url('./images/icons8-plus-math-90.png');
+}
+
+#calculate.button {
+    content:url('./images/icons8-play-96.png');
 }

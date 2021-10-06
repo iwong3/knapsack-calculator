@@ -22,6 +22,7 @@ import './knapsack-calculator.css';
  *      - top always visible
  *      - add / calculate always visible
  *      - close icon has fixed width - spacing is weird because its wrapped by div
+ *      - $ spacing is weird on mobile
  *  - design
  *      - think about separate components
  *      - think about moving functions to utility files
@@ -623,12 +624,8 @@ export default class KnapsackCalculator extends Component {
                 </form>
                 {/* BUTTONS */}
                 <div className="button_group">
-                    <div className="button" id="add-item" onClick={() => this.append_input(-1)}>
-                        Add Item
-                    </div>
-                    <div className="button" id="calculate" onClick={() => this.calculate_solution()}>
-                        Calculate
-                    </div>
+                    <div className="button" id="add-item" onClick={() => this.append_input(-1)} />
+                    <div className="button" id="calculate" onClick={() => this.calculate_solution()} />
                 </div>
             </div>
         )
