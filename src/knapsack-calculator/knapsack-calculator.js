@@ -6,11 +6,7 @@ import './knapsack-calculator.css';
 /**
  *  TODO:
  *  - functionality
- *      - price formatting
- *          - when clicking on price, get ready to re-input? unless no change, then keep prev value
  *      - look into O(W) space version of dp knapsack
- *      - remove item - update pinned totals/remaining
- *      - updating price should unpin item
  *      - show list of selected items
  *      - input for quantity (think about how to handle quantity, not trivial)
  *      - sort orders (price, alphabetical, input order)
@@ -51,6 +47,7 @@ export default class KnapsackCalculator extends Component {
             pinned_items: [false, false, false, false, false],
             pinned_total: 0,
             remainder: "10.00",
+            saved_price: "",
             target: "10.00",
             total: "0.00",
         }
@@ -163,7 +160,7 @@ export default class KnapsackCalculator extends Component {
         this.setState({
             item_selections: item_selections,
             remainder: remainder,
-            total: total
+            total: total,
         })
     }
 
@@ -223,7 +220,7 @@ export default class KnapsackCalculator extends Component {
                         type="text"
                         placeholder="0.00"
                         value={this.state.item_prices[index]}
-                        dir="rtl"
+                        onClick={(e) => this.handle_item_price_click(e, index)}
                         onChange={(e) => this.handle_item_price_change(e, index)}
                         onBlur={(e) => this.check_price(e, index)}
                     />
@@ -268,7 +265,7 @@ export default class KnapsackCalculator extends Component {
             item_names: item_names,
             item_prices: item_prices,
             item_selections: item_selections,
-            pinned_items: pinned_items
+            pinned_items: pinned_items,
         }, function() {
             this.reset_item_selections()
         })
@@ -279,12 +276,19 @@ export default class KnapsackCalculator extends Component {
         // stop auto refresh
         e.preventDefault()
 
-        // remove item
+        // grab item vars
         const updated_inputs = this.state.inputs
         const updated_item_names = this.state.item_names
         const updated_item_prices = this.state.item_prices
         const updated_item_selections = this.state.item_selections
         const updated_pinned_items = this.state.pinned_items
+
+        // check if pinned item
+        if (updated_pinned_items[index]) {
+            this.toggle_pin_input(e, index)
+        }
+
+        // remove item
         updated_inputs.pop()
         updated_item_names.splice(index, 1)
         updated_item_prices.splice(index, 1)
@@ -297,7 +301,7 @@ export default class KnapsackCalculator extends Component {
             item_names: updated_item_names,
             item_prices: updated_item_prices,
             item_selections: updated_item_selections,
-            pinned_items: updated_pinned_items
+            pinned_items: updated_pinned_items,
         }, function() {
             this.reset_item_selections()
         })
@@ -321,7 +325,7 @@ export default class KnapsackCalculator extends Component {
             const price = this.toFixedNumber(parseFloat(input), 2)
             if (isNaN(price) || price <= this.MAX_TARGET) {
                 this.setState({
-                    target: input
+                    target: input,
                 }, function() {
                     this.reset_item_selections()
                 })
@@ -331,11 +335,16 @@ export default class KnapsackCalculator extends Component {
 
     // pin & unpin item for selection
     toggle_pin_input = (e, index) => {
-        // grab pin and price vars
+        // grab pinned vars
         let pinned_items = this.state.pinned_items
         let pinned_total = this.state.pinned_total
         const item_prices = this.state.item_prices
-        const pinned_item_price = this.toFixedNumber(parseFloat(item_prices[index]), 2)
+        let pinned_item_price = this.toFixedNumber(parseFloat(item_prices[index]), 2)
+        // pinned item price is being changed - use saved price
+        if (item_prices[index] === "") {
+            const saved_price = this.state.saved_price
+            pinned_item_price = this.toFixedNumber(parseFloat(saved_price), 2)
+        }
         let num_pinned_items = this.state.num_pinned_items
 
         // pin
@@ -367,30 +376,47 @@ export default class KnapsackCalculator extends Component {
         })
     }
 
-    // item names handler
+    // item names change handler
     handle_item_name_change = (e, index) => {
         let item_names = this.state.item_names
         item_names[index] = e.target.value
         this.setState({
-            item_names: item_names
+            item_names: item_names,
         }, function() {
             this.reset_item_selections()
         })
     }
 
-    // item prices handler
+    // item prices click handler
+    handle_item_price_click = (e, index) => {
+        // save original price
+        const saved_price = e.target.value
+
+        // clear price
+        let item_prices = this.state.item_prices
+        item_prices[index] = ""
+        this.setState({
+            item_prices: item_prices,
+            saved_price: saved_price,
+        }, function() {
+            this.reset_item_selections()
+        })
+    }
+
+    // item prices change handler
     handle_item_price_change = (e, index) => {
+        // unpin item if pinned
+        const updated_pinned_items = this.state.pinned_items
+        if (updated_pinned_items[index]) {
+            this.toggle_pin_input(e, index)
+        }
+
         let input = e.target.value
-        if (this.REGEX_PRICE_RTL.test(input)) {
-            // fix decimals
-            if (input.length >= 3 && input.slice(-1) !== '.') {
-                input = input.replace('.', '')
-                input = input.slice(0, -2) + '.' + input.slice(-2)
-            }
+        if (this.REGEX_PRICE.test(input)) {
             let item_prices = this.state.item_prices
             item_prices[index] = input
             this.setState({
-                item_prices: item_prices
+                item_prices: item_prices,
             }, function() {
                 this.reset_item_selections()
             })
@@ -413,24 +439,37 @@ export default class KnapsackCalculator extends Component {
         return input
     }
 
-    // standardizes decimals in price string (rtl)
+    // standardizes decimals in price string
     format_decimals_string = (input) => {
-        if (input.length === 1) {
-            return ".0" + input
+        // no decimals
+        if (!input.includes('.')) {
+            return input + ".00"
         }
-        if (input.length === 2) {
-            return "." + input
-        }
-        if (input.slice(-1) === '.') {
-            return input + "00"
+        // incomplete decimals
+        if (this.REGEX_DECIMALS.test(input)) {
+            // ends with decimal
+            if (input.slice(-1) === '.') {
+                return input + "00"
+            }
+            // ends with decimal and one digit
+            else {
+                return input + "0"
+            }
         }
         return input
     }
 
     // price formatting on blur
     check_price = (e, index) => {
-        // format input
+        // check for saved original price & reset saved price
         let input = e.target.value
+        let saved_price = this.state.saved_price
+        if (input === "" && saved_price !== "") {
+            input = saved_price
+        }
+        saved_price = ""
+
+        // format input
         input = this.format_price_string(input)
 
         // update item price
@@ -439,7 +478,8 @@ export default class KnapsackCalculator extends Component {
 
         // update state & reset selections
         this.setState({
-            item_prices: item_prices
+            item_prices: item_prices,
+            saved_price: saved_price,
         }, function() {
             this.reset_item_selections()
         })
@@ -453,7 +493,7 @@ export default class KnapsackCalculator extends Component {
 
         // update state & reset selections
         this.setState({
-            target: input
+            target: input,
         }, function() {
             this.reset_item_selections()
         })
