@@ -37,6 +37,11 @@ export default class KnapsackCalculator extends Component {
     REGEX_PRICE = /^((\d)*(\.\d{0,2})?)$/
     REGEX_PRICE_RTL = /^((\d)*(\.)?(\d)*)$/
 
+    // sort by vars
+    SORT_BY_INPUT = "input"
+    SORT_BY_NAME = "name"
+    SORT_BY_PRICE = "price"
+
     constructor(props) {
         super(props)
 
@@ -170,6 +175,84 @@ export default class KnapsackCalculator extends Component {
             remainder: remainder,
             total: total,
         })
+    }
+
+    sort_items = (sort_by, desc) => {
+        // grab item vars
+        const inputs = this.state.inputs
+        const item_names = this.state.item_names
+        const item_prices = this.state.item_prices.map(price => {
+            // check for new items w/out price
+            if (price === "") {
+                price = "0.00"
+            }
+            return this.toFixedNumber(parseFloat(price), 2)
+        })
+        const item_selections = this.state.item_selections
+        const pinned_items = this.state.pinned_items
+
+        // put item properties into one object for sorting
+        let items = []
+        for (let i = 0; i < item_prices.length; i++) {
+            items.push({
+                input: inputs[i],
+                name: item_names[i],
+                price: item_prices[i],
+                selected: item_selections[i],
+                pinned: pinned_items[i],
+            })
+        }
+
+        // sort items
+        this.sort_by_attr(items, sort_by, desc)
+
+        // get item vars in sorted order
+        let sorted_inputs = []
+        let sorted_item_names = []
+        let sorted_item_prices = []
+        let sorted_item_selections = []
+        let sorted_pinned_items = []
+        for (let i = 0; i < items.length; i++) {
+            sorted_inputs.push(items[i].input)
+            sorted_item_names.push(items[i].name)
+            sorted_item_prices.push((items[i].price).toFixed(2))
+            sorted_item_selections.push(items[i].selected)
+            sorted_pinned_items.push(items[i].pinned)
+        }
+
+        // update state
+        this.setState({
+            inputs: sorted_inputs,
+            item_names: sorted_item_names,
+            item_prices: sorted_item_prices,
+            item_selections: sorted_item_selections,
+            pinned_items: sorted_pinned_items,
+        })
+    }
+
+    sort_by_attr = (items, attr, desc) => {
+        // descending
+        if (desc) {
+            items.sort((a, b) => {
+                if (a[attr] > b[attr]) {
+                    return -1
+                } else if (a[attr] < b[attr]) {
+                    return 1
+                }
+                return 0
+            })
+        }
+        // ascending
+        else {
+            items.sort((a, b) => {
+                if (a[attr] < b[attr]) {
+                    return -1
+                } else if (a[attr] > b[attr]) {
+                    return 1
+                }
+                return 0
+            })
+        }
     }
 
     /* LOGIC HELPERS */
@@ -598,6 +681,7 @@ export default class KnapsackCalculator extends Component {
                                 className="input_group-input"
                                 id="target-input"
                                 type="text"
+                                inputMode="numeric"
                                 value={this.state.target}
                                 onClick={(e) => this.handle_target_click(e)}
                                 onChange={(e) => this.handle_target_change(e)}
@@ -618,7 +702,7 @@ export default class KnapsackCalculator extends Component {
                 </div>
                 {/* ITEM INPUTS */}
                 <form>
-                    {this.state.inputs.map(index => {
+                    {this.state.inputs.map((input, index) => {
                         return this.render_input(index)
                     })}
                 </form>
@@ -626,6 +710,14 @@ export default class KnapsackCalculator extends Component {
                 <div className="button_group">
                     <div className="button" id="add-item" onClick={() => this.append_input(-1)} />
                     <div className="button" id="calculate" onClick={() => this.calculate_solution()} />
+                </div>
+                <div className="button_group">
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_INPUT, true)}>#D</div>
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_INPUT, false)}>#A</div>
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_NAME, true)}>@D</div>
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_NAME, false)}>@A</div>
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_PRICE, true)}>$D</div>
+                    <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_PRICE, false)}>$A</div>
                 </div>
             </div>
         )
