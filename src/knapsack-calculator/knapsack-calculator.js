@@ -1,32 +1,10 @@
 import React, { Component } from 'react';
 
+import * as numUtils from '../utils/numbers';
+
 import './knapsack-calculator.css';
 
 
-/**
- *  TODO:
- *  - functionality
- *      - look into O(W) space version of dp knapsack
- *      - show list of selected items
- *      - input for quantity (think about how to handle quantity, not trivial)
- *      - sort orders (price, alphabetical, input order)
- *      - click and drag/drop
- *      - reset button w/ confirmation?
- *      - calculate in sorted order - if not all items of a price are selected, show "pick x"
- *      - focus on new item when pressing enter
- *      - unpin all button
- *      - tax rate
- *      - user feedback (cant pin, not a number (price & target))
- *  - bugs
- *  - styling
- *      - top always visible
- *      - add / calculate always visible
- *      - close icon has fixed width - spacing is weird because its wrapped by div
- *      - $ spacing is weird on mobile
- *  - design
- *      - think about separate components
- *      - think about moving functions to utility files
- */
 export default class KnapsackCalculator extends Component {
 
     // price vars
@@ -46,6 +24,7 @@ export default class KnapsackCalculator extends Component {
         super(props)
 
         this.state = {
+            menu_pin_selected: false,
             inputs: [0, 1, 2, 3, 4],
             item_names: ["soda", "watermelon", "chips", "pomegranate", "pie"],
             item_prices: ["0.99", "5.99", "1.99", "2.99", "3.14"],
@@ -85,11 +64,11 @@ export default class KnapsackCalculator extends Component {
 
         // init vars for knapsack
         let item_prices = this.state.item_prices.map(price => {
-            return this.toFixedNumber(parseFloat(price) * 100, 0)
+            return numUtils.toFixedNumber(parseFloat(price) * 100, 0)
         })
         let item_idxs = JSON.parse(JSON.stringify(this.state.inputs))
         let num_items = item_prices.length
-        let target = this.toFixedNumber(parseFloat(this.state.target) * 100, 0)
+        let target = numUtils.toFixedNumber(parseFloat(this.state.target) * 100, 0)
         let updatedTarget = target
 
         // filter out pinned items
@@ -110,8 +89,8 @@ export default class KnapsackCalculator extends Component {
             item_prices = unpinned_item_prices
             item_idxs = unpinned_item_idxs
             num_items -= num_pinned_items
-            const pinned_total = this.toFixedNumber(parseFloat(this.state.pinned_total) * 100, 0)
-            updatedTarget = this.toFixedNumber(updatedTarget - pinned_total, 2)
+            const pinned_total = numUtils.toFixedNumber(parseFloat(this.state.pinned_total) * 100, 0)
+            updatedTarget = numUtils.toFixedNumber(updatedTarget - pinned_total, 2)
         }
 
         // init table for dp
@@ -140,9 +119,9 @@ export default class KnapsackCalculator extends Component {
 
         // get total cost and remainder of selected items
         const pinned_total = this.state.pinned_total
-        const unpinned_total = this.toFixedNumber(T[num_items][updatedTarget] / 100., 2)
-        let total = this.toFixedNumber(pinned_total + unpinned_total, 2)
-        let remainder = this.toFixedNumber((target / 100.) - total, 2)
+        const unpinned_total = numUtils.toFixedNumber(T[num_items][updatedTarget] / 100., 2)
+        let total = numUtils.toFixedNumber(pinned_total + unpinned_total, 2)
+        let remainder = numUtils.toFixedNumber((target / 100.) - total, 2)
 
         // set total cost and remainder to strings
         total = total.toFixed(2)
@@ -186,7 +165,7 @@ export default class KnapsackCalculator extends Component {
             if (price === "") {
                 price = "0.00"
             }
-            return this.toFixedNumber(parseFloat(price), 2)
+            return numUtils.toFixedNumber(parseFloat(price), 2)
         })
         const item_selections = this.state.item_selections
         const pinned_items = this.state.pinned_items
@@ -255,12 +234,39 @@ export default class KnapsackCalculator extends Component {
         }
     }
 
-    /* LOGIC HELPERS */
+    /* MENU VISUALS */
 
-    // get number with fixed decimal spaces
-    toFixedNumber = (num, decimals) => {
-        const pow = Math.pow(10, decimals)
-        return Math.round(num * pow) / pow;
+    // render menu
+    render_menu = () => {
+        // dynamic classname for indicating selections
+        let menu_item_id = "unselected"
+        if (this.state.menu_pin_selected === true) {
+            menu_item_id = "selected"
+        }
+
+        return (
+            <div className="main_menu">
+                <div className={"menu_item-section-"+menu_item_id} id="pin">
+                    <div
+                        className={"pin_all_icon-"+menu_item_id}
+                        onClick={(e) => {this.toggle_pin_menu(e)}}>
+                    </div>
+                </div>
+                <div className={"menu_item-section-"+menu_item_id} id="space"/>
+                <div className={"menu_item-section-"+menu_item_id} id="sort">
+                </div>
+            </div>
+        )
+    }
+
+    /* MENU LOGIC */
+
+    toggle_pin_menu = () => {
+        this.setState({
+            menu_pin_selected: !this.state.menu_pin_selected,
+        }, function() {
+            this.reset_item_selections()
+        })
     }
 
     /* FORM VISUALS */
@@ -435,7 +441,7 @@ export default class KnapsackCalculator extends Component {
         let input = e.target.value
         if (this.REGEX_PRICE.test(input)) {
             // make sure target is below max budget
-            const price = this.toFixedNumber(parseFloat(input), 2)
+            const price = numUtils.toFixedNumber(parseFloat(input), 2)
             if (isNaN(price) || price <= this.MAX_TARGET) {
                 // update state & reset selections
                 this.setState({
@@ -453,22 +459,22 @@ export default class KnapsackCalculator extends Component {
         let pinned_items = this.state.pinned_items
         let pinned_total = this.state.pinned_total
         const item_prices = this.state.item_prices
-        let pinned_item_price = this.toFixedNumber(parseFloat(item_prices[index]), 2)
+        let pinned_item_price = numUtils.toFixedNumber(parseFloat(item_prices[index]), 2)
         // pinned item price is being changed - use saved price
         if (item_prices[index] === "") {
             const saved_price = this.state.saved_price
-            pinned_item_price = this.toFixedNumber(parseFloat(saved_price), 2)
+            pinned_item_price = numUtils.toFixedNumber(parseFloat(saved_price), 2)
         }
         let num_pinned_items = this.state.num_pinned_items
 
         // pin
         if (!pinned_items[index]) {
             // check if pinning item goes over target
-            const target = this.toFixedNumber(parseFloat(this.state.target), 2)
+            const target = numUtils.toFixedNumber(parseFloat(this.state.target), 2)
             if (pinned_total + pinned_item_price <= target) {
                 // pin item and update pinned vars
                 pinned_items[index] = true
-                pinned_total = this.toFixedNumber(pinned_total + pinned_item_price, 2)
+                pinned_total = numUtils.toFixedNumber(pinned_total + pinned_item_price, 2)
                 num_pinned_items += 1
             }
         }
@@ -476,7 +482,7 @@ export default class KnapsackCalculator extends Component {
         else {
             // unpin item and update pinned vars
             pinned_items[index] = false
-            pinned_total = this.toFixedNumber(pinned_total - pinned_item_price, 2)
+            pinned_total = numUtils.toFixedNumber(pinned_total - pinned_item_price, 2)
             num_pinned_items -= 1
         }
 
@@ -657,7 +663,7 @@ export default class KnapsackCalculator extends Component {
         // reset total and remainder, accounting for pinned items
         const pinned_total = this.state.pinned_total
         const total = this.format_price_string("" + pinned_total)
-        const remainder = this.toFixedNumber(this.state.target - pinned_total, 2)
+        const remainder = numUtils.toFixedNumber(this.state.target - pinned_total, 2)
         const remainderStr = this.format_price_string("" + remainder)
 
         // update state
@@ -673,10 +679,10 @@ export default class KnapsackCalculator extends Component {
             <div className="KnapsackCalculator">
                 {/* HEADERS */}
                 <div className="header_top">
-                    <div className="header1">
-                        <div className="header1-label">Budget</div>
-                        <div className="header1-input">
-                            <div className="header1-input-label">$</div>
+                    <div className="header_top_main">
+                        <div className="header_top_main-label">Budget</div>
+                        <div className="header_top_main-input">
+                            <div className="header_top_main-input-label">$</div>
                             <input
                                 className="input_group-input"
                                 id="target-input"
@@ -689,17 +695,19 @@ export default class KnapsackCalculator extends Component {
                             />
                         </div>
                     </div>
-                    <div className="header2">
-                        <div className="header2-section">
-                            <div className="header2-label">Total</div>
-                            <div className="header2-value">{"$"+this.state.total}</div>
+                    <div className="header_top_secondary">
+                        <div className="header_top_secondary-section">
+                            <div className="header_top_secondary-label">Total</div>
+                            <div className="header_top_secondary-value">{"$"+this.state.total}</div>
                         </div>
-                        <div className="header2-section">
-                            <div className="header2-label">Remaining</div>
-                            <div className="header2-value">{"$"+this.state.remainder}</div>
+                        <div className="header_top_secondary-section">
+                            <div className="header_top_secondary-label">Remaining</div>
+                            <div className="header_top_secondary-value">{"$"+this.state.remainder}</div>
                         </div>
                     </div>
                 </div>
+                {/* MENU BAR */}
+                {/* {this.render_menu()} */}
                 {/* ITEM INPUTS */}
                 <form>
                     {this.state.inputs.map((input, index) => {
@@ -711,14 +719,14 @@ export default class KnapsackCalculator extends Component {
                     <div className="button" id="add-item" onClick={() => this.append_input(-1)} />
                     <div className="button" id="calculate" onClick={() => this.calculate_solution()} />
                 </div>
-                <div className="button_group">
+                {/* <div className="button_group">
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_INPUT, true)}>#D</div>
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_INPUT, false)}>#A</div>
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_NAME, true)}>@D</div>
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_NAME, false)}>@A</div>
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_PRICE, true)}>$D</div>
                     <div className="button" id="sort" onClick={() => this.sort_items(this.SORT_BY_PRICE, false)}>$A</div>
-                </div>
+                </div> */}
             </div>
         )
     }

@@ -23,14 +23,14 @@
     width: 100%;
 }
 
-.header1 {
+.header_top_main {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.header1-input {
+.header_top_main-input {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -43,14 +43,14 @@
     font-weight: bold;
 }
 
-.header2 {
+.header_top_secondary {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
 
-.header2-section {
+.header_top_secondary-section {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -58,16 +58,47 @@
     width: 50%;
 }
 
-.header2-value {
+.header_top_secondary-value {
     font-size: 1.1em;
     font-weight: bold;
+}
+
+/* MENU */
+
+.main_menu {
+    display: flex;
+    width: 100%;
+    padding: 2.5% 0% 0% 0%;
+}
+
+.menu_item-section-unselected, .menu_item-section-selected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#pin.menu_item-section-unselected, #pin.menu_item-section-selected {
+    flex: 1;
+    padding: 0% 0% 0% 1%;
+    justify-content: center;
+    align-items: center;
+}
+
+#space.menu_item-section-unselected, #space.menu_item-section-selected {
+    flex: 5;
+    padding: 0% 2.5% 0% 0%;
+}
+
+#sort.menu_item-section-unselected, #sort.menu_item-section-selected {
+    flex: 3;
+    padding: 0% 0% 0% 0%;
 }
 
 /* FORM & INPUTS */
 
 form {
     width: 100%;
-    padding: 5%;
+    padding: 2.5% 5% 0% 5%;
 }
 
 .input_group-unselected, .input_group-selected {
@@ -116,7 +147,7 @@ form {
     padding: 0% 1% 0% 0%;
 }
 
-.pin_icon-unselected, .pin_icon-selected {
+.pin_all_icon-unselected, .pin_all_icon-selected, .pin_icon-unselected, .pin_icon-selected {
     /* spacing */
     height: 18px;
     width: 18px;
@@ -124,9 +155,25 @@ form {
     transition: filter 0.2s ease;
 }
 
-.pin_icon-unselected:hover, .pin_icon-selected:hover {
+.pin_all_icon-unselected, .pin_all_icon-selected {
+    border-color: #000000;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 2px;
+    padding: 10%;
+}
+
+.pin_all_icon-selected {
+    background-color: #ffdc00;
+}
+
+.pin_all_icon-unselected:hover, .pin_all_icon-selected:hover, .pin_icon-unselected:hover, .pin_icon-selected:hover {
     cursor: pointer;
     filter: brightness(120%);
+}
+
+.pin_all_icon-unselected, .pin_all_icon-selected {
+    content:url('./images/icons8-check-all-48.png')
 }
 
 .pin_icon-unselected {
