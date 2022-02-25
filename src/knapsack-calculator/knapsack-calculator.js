@@ -24,7 +24,6 @@ export default class KnapsackCalculator extends Component {
         super(props)
 
         this.state = {
-            menu_pin_selected: false,
             inputs: [0, 1, 2, 3, 4],
             item_names: ["soda", "watermelon", "chips", "pomegranate", "pie"],
             item_prices: ["0.99", "5.99", "1.99", "2.99", "3.14"],
@@ -246,14 +245,24 @@ export default class KnapsackCalculator extends Component {
 
         return (
             <div className="main_menu">
-                <div className={"menu_item-section-"+menu_item_id} id="pin">
+                <div className={"menu_item-section-"+menu_item_id} id="clear-pins">
                     <div
-                        className={"pin_all_icon-"+menu_item_id}
-                        onClick={(e) => {this.toggle_pin_menu(e)}}>
+                        className="clear_pins_icon"
+                        onClick={() => {this.clear_pins()}}>
                     </div>
                 </div>
-                <div className={"menu_item-section-"+menu_item_id} id="space"/>
-                <div className={"menu_item-section-"+menu_item_id} id="sort">
+                <div className="menu_item-section" id="space"/>
+                <div className="menu_item-section" id="sort">
+                    <div
+                        className={"sort_button"}
+                        onClick={() => {}}>
+                        Sort By
+                    </div>
+                    <div className="sort_menu">
+                        <div>A-Z</div>
+                        <div>Z-A</div>
+                    </div>
+
                 </div>
             </div>
         )
@@ -261,9 +270,12 @@ export default class KnapsackCalculator extends Component {
 
     /* MENU LOGIC */
 
-    toggle_pin_menu = () => {
+    // clear all pinned items
+    clear_pins = () => {
         this.setState({
-            menu_pin_selected: !this.state.menu_pin_selected,
+            num_pinned_items: 0,
+            pinned_items: new Array(this.state.pinned_items.length).fill(false),
+            pinned_total: 0,
         }, function() {
             this.reset_item_selections()
         })
@@ -696,18 +708,18 @@ export default class KnapsackCalculator extends Component {
                         </div>
                     </div>
                     <div className="header_top_secondary">
-                        <div className="header_top_secondary-section">
+                        <div className="header_top_secondary-section" id="total">
                             <div className="header_top_secondary-label">Total</div>
                             <div className="header_top_secondary-value">{"$"+this.state.total}</div>
                         </div>
-                        <div className="header_top_secondary-section">
+                        <div className="header_top_secondary-section" id="remaining">
                             <div className="header_top_secondary-label">Remaining</div>
                             <div className="header_top_secondary-value">{"$"+this.state.remainder}</div>
                         </div>
                     </div>
                 </div>
                 {/* MENU BAR */}
-                {/* {this.render_menu()} */}
+                {this.render_menu()}
                 {/* ITEM INPUTS */}
                 <form>
                     {this.state.inputs.map((input, index) => {
